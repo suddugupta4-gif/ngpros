@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "Match Report Generator"
+version = "1.0.0"
+id = "artifacts/match-report"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20406
+
+[services.development]
+run = "pnpm --filter @workspace/match-report run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/match-report", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/match-report/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20406"
+BASE_PATH = "/"
