@@ -96,8 +96,8 @@ export function MatchReportCanvas({ kills, position, points }: MatchReportCanvas
         height={CANVAS_HEIGHT}
         className="rounded shadow-2xl"
         style={{
-          /* Fit inside the available space while keeping aspect ratio */
-          maxHeight: '100%',
+          /* Mobile: compact so form is visible below. Desktop: fills panel. */
+          maxHeight: 'min(52vw * 1.79, 46vh)',
           maxWidth:  '100%',
           width:     'auto',
           height:    'auto',
