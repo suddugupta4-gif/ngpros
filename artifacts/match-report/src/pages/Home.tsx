@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { MatchReportCanvas } from '@/components/MatchReportCanvas';
 import { ControlPanel } from '@/components/ControlPanel';
 import templateImg from '@assets/Gemini_Generated_Image_fo78v5fo78v5fo78_1784824936063.png';
@@ -56,7 +56,6 @@ export default function Home() {
   const [kills, setKills] = useState('');
   const [position, setPosition] = useState('');
   const [points, setPoints] = useState('');
-  const downloadCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const handleDownload = () => {
     return new Promise<void>((resolve) => {
@@ -64,7 +63,7 @@ export default function Home() {
       canvas.width = CANVAS_WIDTH;
       canvas.height = CANVAS_HEIGHT;
       const ctx = canvas.getContext('2d');
-      
+
       if (!ctx) {
         resolve();
         return;
@@ -74,7 +73,6 @@ export default function Home() {
       img.src = templateImg;
       img.onload = () => {
         ctx.drawImage(img, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
         drawGoldText(ctx, kills, boxes.kills.cx, boxes.kills.cy, boxes.kills.w, boxes.kills.maxFont);
         drawGoldText(ctx, position, boxes.position.cx, boxes.position.cy, boxes.position.w, boxes.position.maxFont);
         drawGoldText(ctx, points, boxes.points.cx, boxes.points.cy, boxes.points.w, boxes.points.maxFont);
@@ -97,15 +95,29 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-[100dvh] w-full bg-background overflow-hidden">
-      <div className="h-[100dvh] flex flex-col lg:flex-row">
-        {/* Canvas Preview */}
-        <div className="flex-1 flex items-center justify-center p-4 lg:p-8 bg-gradient-to-br from-background via-background to-card/30">
+    <div className="min-h-screen w-full bg-background">
+      {/* Subtle grid overlay */}
+      <div
+        className="fixed inset-0 pointer-events-none opacity-[0.02] z-0"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, hsl(var(--primary)) 1px, transparent 1px),
+            linear-gradient(to bottom, hsl(var(--primary)) 1px, transparent 1px)
+          `,
+          backgroundSize: '40px 40px',
+        }}
+      />
+
+      {/* Desktop: side-by-side. Mobile: stacked, scrollable */}
+      <div className="relative z-10 flex flex-col lg:flex-row lg:min-h-screen">
+
+        {/* Canvas preview — takes up reasonable space on mobile, half screen on desktop */}
+        <div className="w-full lg:flex-1 flex items-center justify-center p-4 lg:p-8 lg:sticky lg:top-0 lg:h-screen">
           <MatchReportCanvas kills={kills} position={position} points={points} />
         </div>
 
-        {/* Control Panel */}
-        <div className="lg:w-[480px] flex items-center justify-center bg-card/50 backdrop-blur-sm border-t lg:border-t-0 lg:border-l border-border">
+        {/* Control panel — full width below on mobile, sidebar on desktop */}
+        <div className="w-full lg:w-[420px] lg:min-h-screen flex items-start lg:items-center justify-center bg-card/50 backdrop-blur-sm border-t lg:border-t-0 lg:border-l border-border py-6 lg:py-8">
           <ControlPanel
             kills={kills}
             position={position}
@@ -116,19 +128,8 @@ export default function Home() {
             onDownload={handleDownload}
           />
         </div>
-      </div>
 
-      {/* Subtle grid overlay */}
-      <div
-        className="fixed inset-0 pointer-events-none opacity-[0.02]"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, hsl(var(--primary)) 1px, transparent 1px),
-            linear-gradient(to bottom, hsl(var(--primary)) 1px, transparent 1px)
-          `,
-          backgroundSize: '40px 40px',
-        }}
-      />
+      </div>
     </div>
   );
 }

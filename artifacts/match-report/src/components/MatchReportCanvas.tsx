@@ -26,34 +26,34 @@ function drawGoldText(
   maxFont: number
 ) {
   if (!text) return;
-  
+
   let size = maxFont;
   ctx.font = `bold ${size}px Arial, sans-serif`;
-  
+
   while (ctx.measureText(text).width > maxWidth && size > 20) {
     size -= 2;
     ctx.font = `bold ${size}px Arial, sans-serif`;
   }
-  
+
   ctx.save();
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  
+
   const grad = ctx.createLinearGradient(cx, cy - size / 2, cx, cy + size / 2);
   grad.addColorStop(0, '#f6d38a');
   grad.addColorStop(1, '#c99a3f');
-  
+
   ctx.shadowColor = 'rgba(0,0,0,0.6)';
   ctx.shadowBlur = 6;
   ctx.shadowOffsetY = 3;
-  
+
   ctx.lineWidth = size * 0.06;
   ctx.strokeStyle = 'rgba(60,35,10,0.9)';
   ctx.strokeText(text, cx, cy);
-  
+
   ctx.fillStyle = grad;
   ctx.fillText(text, cx, cy);
-  
+
   ctx.restore();
 }
 
@@ -61,20 +61,7 @@ export function MatchReportCanvas({ kills, position, points }: MatchReportCanvas
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
 
-  useEffect(() => {
-    const img = new Image();
-    img.src = templateImg;
-    img.onload = () => {
-      imageRef.current = img;
-      redraw();
-    };
-  }, []);
-
-  useEffect(() => {
-    redraw();
-  }, [kills, position, points]);
-
-  const redraw = () => {
+  const redraw = (k: string, pos: string, pts: string) => {
     const canvas = canvasRef.current;
     const img = imageRef.current;
     if (!canvas || !img) return;
@@ -85,28 +72,50 @@ export function MatchReportCanvas({ kills, position, points }: MatchReportCanvas
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     ctx.drawImage(img, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    drawGoldText(ctx, kills, boxes.kills.cx, boxes.kills.cy, boxes.kills.w, boxes.kills.maxFont);
-    drawGoldText(ctx, position, boxes.position.cx, boxes.position.cy, boxes.position.w, boxes.position.maxFont);
-    drawGoldText(ctx, points, boxes.points.cx, boxes.points.cy, boxes.points.w, boxes.points.maxFont);
+    drawGoldText(ctx, k, boxes.kills.cx, boxes.kills.cy, boxes.kills.w, boxes.kills.maxFont);
+    drawGoldText(ctx, pos, boxes.position.cx, boxes.position.cy, boxes.position.w, boxes.position.maxFont);
+    drawGoldText(ctx, pts, boxes.points.cx, boxes.points.cy, boxes.points.w, boxes.points.maxFont);
   };
+
+  useEffect(() => {
+    const img = new Image();
+    img.src = templateImg;
+    img.onload = () => {
+      imageRef.current = img;
+      redraw(kills, position, points);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (imageRef.current) {
+      redraw(kills, position, points);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [kills, position, points]);
 
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4 }}
-      className="relative w-full h-full flex items-center justify-center"
+      className="flex items-center justify-center w-full"
     >
-      <div className="relative" style={{ aspectRatio: `${CANVAS_WIDTH}/${CANVAS_HEIGHT}` }}>
-        <canvas
-          ref={canvasRef}
-          width={CANVAS_WIDTH}
-          height={CANVAS_HEIGHT}
-          className="w-full h-full shadow-2xl"
-          style={{ maxHeight: '85vh' }}
-          data-testid="canvas-preview"
-        />
-      </div>
+      {/* Constrain height: compact on mobile, taller on desktop */}
+      <canvas
+        ref={canvasRef}
+        width={CANVAS_WIDTH}
+        height={CANVAS_HEIGHT}
+        className="shadow-2xl rounded-sm"
+        style={{
+          maxHeight: 'min(50vh, 90vw * 1.79)',
+          width: 'auto',
+          height: 'auto',
+          maxWidth: '100%',
+          display: 'block',
+        }}
+        data-testid="canvas-preview"
+      />
     </motion.div>
   );
 }
