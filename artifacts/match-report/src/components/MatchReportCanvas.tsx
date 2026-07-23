@@ -12,9 +12,9 @@ const CANVAS_WIDTH  = 1536;
 const CANVAS_HEIGHT = 2752;
 
 const boxes = {
-  kills:    { cx: 425,  cy: 1975, w: 520, maxFont: 90 },
-  position: { cx: 1032, cy: 1975, w: 520, maxFont: 90 },
-  points:   { cx: 755,  cy: 2415, w: 700, maxFont: 100 },
+  kills:    { cx: 425,  cy: 2045, w: 520, maxFont: 90 },
+  position: { cx: 1032, cy: 2045, w: 520, maxFont: 90 },
+  points:   { cx: 755,  cy: 2380, w: 700, maxFont: 100 },
 };
 
 function drawGoldText(
