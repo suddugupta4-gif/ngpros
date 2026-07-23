@@ -129,16 +129,18 @@ function getPreviewPath(): string | null {
 }
 
 function App() {
-  // If no preview path is provided in the URL, default to your component name!
-  const previewPath = getPreviewPath() || "YourComponentName";
+  // Use URL preview path or default to your component name
+  const previewPath = getPreviewPath() || "MatchReport";
 
-  return (
-    <PreviewRenderer
-      componentPath={previewPath}
-      modules={discoveredModules}
-    />
-  );
-}
+  if (previewPath) {
+    return (
+      <PreviewRenderer
+        componentPath={previewPath}
+        modules={discoveredModules}
+      />
+    );
+  }
+
   return <Gallery />;
 }
 
