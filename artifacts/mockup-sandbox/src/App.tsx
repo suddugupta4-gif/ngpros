@@ -129,7 +129,8 @@ function getPreviewPath(): string | null {
 }
 
 function App() {
-  const previewPath = getPreviewPath();
+  // Use URL preview path or default to your component name
+  const previewPath = getPreviewPath() || "MatchReport";
 
   if (previewPath) {
     return (
